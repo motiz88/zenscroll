@@ -119,7 +119,7 @@ Zenscroll automatically adds the configured edge offset when the page is loaded 
 No automatic adjustment happens in the following cases:
 
 - If automatic smooth-scroll is disabled via `noZensmooth` or the native smooth-scrolling (see [1.5](#1.5.disabletheautomaticsmooth-scrolling))
-- If edge offset was set to zero (e.g., `zenscroll.setup(null, 0)`).
+- If edge offset was set to zero (e.g., `zenscroll.setup({edgeOffset: 0})`).
 
 #### 1.2. Limited support for smooth back & forward navigation
 
@@ -131,7 +131,7 @@ This functionality requires browser support for `history.scrollRestoration` whic
 
 The automatic smooth-scroll on local links can also trigger the standard `hashchange` event and the CSS pseudo-class `:target` but only if you set the edge offset to 0. I had to introduce this limitation because otherwise the scrolling isn’t smooth.
 
-So if you need `hashchange` or `:target` then make sure you execute `zenscroll.setup(null, 0)`.
+So if you need `hashchange` or `:target` then make sure you execute `zenscroll.setup({edgeOffset: 0})`.
 
 #### 1.4. No support for automatic scroll to elements inside scrollable elements
 
@@ -310,25 +310,25 @@ It’s easy to change the basic parameters of scrolling:
 ````js
 var defaultDuration = 777 // ms
 var edgeOffset = 42 // px
-zenscroll.setup(defaultDuration, edgeOffset)
+zenscroll.setup({defaultDuration: defaultDuration, edgeOffset: edgeOffset})
 ````
 
 You can change custom scrollers similarly:
 
 ````js
-myScroller.setup(500, 10)
+myScroller.setup({defaultDuration: 500, edgeOffset: 10})
 ````
 
 If you don’t want to change a value just omit the parameter or pass `null`. For example, the line below sets the default duration, while leaving other settings unchanged:
 
 ````js
-zenscroll.setup(777) // only updates defaultDuration to 777
+zenscroll.setup({defaultDuration: 777}) // only updates defaultDuration to 777
 ````
 
 Sets the the spacing between the edge of the screen (or a DIV) and the target element you are scrolling to, while leaving the default duration unchanged:
 
 ````js
-zenscroll.setup(null, 42) // only updates edgeOffset to 42
+zenscroll.setup({edgeOffset: 42}) // only updates edgeOffset to 42
 ````
 
 The function always returns the current values in an object, so even if no parameters are passed you can obtain the current settings:

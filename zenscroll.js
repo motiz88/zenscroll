@@ -144,7 +144,12 @@
 		 * @param {onDone} An optional callback function to be invoked once the scroll finished.
 		 */
 		var scrollToElem = function (elem, duration, onDone) {
-			scrollToY(getTopWithEdgeOffset(elem), duration, onDone)
+			scrollToY(getTopWithEdgeOffset(elem), duration, function () {
+				if (onDone) {
+					onDone();
+				}
+				zenscroll.target = null;
+			})
 		}
 
 		/**
@@ -160,6 +165,7 @@
 			var containerHeight = container.getHeight()
 			var y = container.getY()
 			var containerBottom = y + containerHeight
+			zenscroll.target = elem;
 			if (getTopWithEdgeOffset(elem) < y || (elemHeight + edgeOffset) > containerHeight) {
 				// Element is clipped at top or is higher than screen.
 				scrollToElem(elem, duration, onDone)
@@ -183,25 +189,26 @@
 			scrollToY(Math.max(0, container.getTopOf(elem) - container.getHeight()/2 + (offset || elem.getBoundingClientRect().height/2)), duration, onDone)
 		}
 
+		var currentOptions = {};
+
 		/**
 		 * Changes default settings for this scroller.
 		 *
-		 * @param {newDefaultDuration} Optionally a new value for default duration, used for each scroll method by default.
-		 *        Ignored if null or undefined.
-		 * @param {newEdgeOffset} Optionally a new value for the edge offset, used by each scroll method by default. Ignored if null or undefined.
 		 * @returns An object with the current values.
 		 */
-		var setup = function (newDefaultDuration, newEdgeOffset) {
-			if (newDefaultDuration === 0 || newDefaultDuration) {
-				defaultDuration = newDefaultDuration
+		var setup = function (options) {
+			if (!options) {
+				options = {};
 			}
-			if (newEdgeOffset === 0 || newEdgeOffset) {
-				edgeOffset = newEdgeOffset
+			for (var key in options) {
+				if (Object.prototype.hasOwnProperty.call(options, key)) {
+					var value = options[key];
+					if (value === 0 || value === false || value) {
+						currentOptions[key] = value;
+					}
+				}
 			}
-			return {
-				defaultDuration: defaultDuration,
-				edgeOffset: edgeOffset
-			}
+			return currentOptions;
 		}
 
 		return {
@@ -213,7 +220,8 @@
 			stop: stopScroll,
 			moving: function () { return !!scrollTimeoutId },
 			getY: container.getY,
-			getTopOf: container.getTopOf
+			getTopOf: container.getTopOf,
+			target: null
 		}
 
 	}
@@ -339,6 +347,10 @@
 					targetY = Math.max(0, targetY - edgeOffset)
 					onDone = function () { history.pushState(null, "", href) }
 				}
+				if (zenscroll.setup().noLocation) {
+					onDone = function () { }
+				}
+				zenscroll.target = targetElem;
 				zenscroll.toY(targetY, null, onDone)
 			}
 		}, false)
